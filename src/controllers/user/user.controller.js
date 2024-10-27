@@ -45,5 +45,7 @@ exports.updateUser = catchAsync(async (req, res) => {
 });
 
 exports.deleteUser = catchAsync(async (req, res) => {
-  res.status(204);
+  await prisma.users.deleteMany({});
+
+  res.status(204).send();
 });
