@@ -1,8 +1,9 @@
+const prisma = require("../../../database/client");
 const { UserRoles } = require("@prisma/client");
 
-const prisma = require("../../../database/client");
+const catchAsync = require("./../../utils/catchAsync");
 
-exports.getAllUsers = async (req, res) => {
+exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await prisma.users.findMany({});
 
   res.status(200).json({
@@ -11,16 +12,16 @@ exports.getAllUsers = async (req, res) => {
       users,
     },
   });
-};
+});
 
-exports.getUser = async (req, res) => {
+exports.getUser = catchAsync(async (req, res) => {
   res.status(200).json({
     status: "success",
     message: "Working on getting single user",
   });
-};
+});
 
-exports.createUser = async (req, res) => {
+exports.createUser = catchAsync(async (req, res) => {
   const userDoc = { ...req.body };
   userDoc.userRole = UserRoles.USER;
 
@@ -34,15 +35,15 @@ exports.createUser = async (req, res) => {
       user,
     },
   });
-};
+});
 
-exports.updateUser = async (req, res) => {
+exports.updateUser = catchAsync(async (req, res) => {
   res.status(200).json({
     status: "success",
     message: "Working on updateing user",
   });
-};
+});
 
-exports.deleteUser = async (req, res) => {
+exports.deleteUser = catchAsync(async (req, res) => {
   res.status(204);
-};
+});
