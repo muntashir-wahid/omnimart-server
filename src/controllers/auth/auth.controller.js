@@ -10,10 +10,25 @@ const signToken = (userInfo) => {
   });
 };
 
-exports.login = catchAsync(async (req, res, next) => {
+exports.login = catchAsync(async (req, res) => {
+  const { authenticatedUser } = req;
+
+  const token = signToken({
+    uid: authenticatedUser.uid,
+    userRole: authenticatedUser.userRole,
+  });
+
+  res.cookie("ACCESS_TOKEN", token, {
+    secure: true,
+    httpOnly: true,
+    sameSite: "none",
+  });
+
   res.status(200).json({
     status: "success",
-    message: "Working on login",
+    data: {
+      user: authenticatedUser,
+    },
   });
 });
 
@@ -24,6 +39,7 @@ exports.register = catchAsync(async (req, res) => {
       uid: true,
       firstName: true,
       lastName: true,
+      email: true,
       userRole: true,
       phone: true,
     },
