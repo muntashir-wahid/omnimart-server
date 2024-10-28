@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 
 const prisma = require("../../../../database/client");
-const { Status } = require("@prisma/client");
+const { Status, UserRoles } = require("@prisma/client");
 
 const catchAsync = require("../../../utils/catchAsync");
 
@@ -9,6 +9,7 @@ exports.encryptPassword = catchAsync(async (req, res, next) => {
   const { firstName, lastName, email, password, phone } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 12);
+  const userRole = req.body.userRole || UserRoles.USER;
 
   const userDoc = {
     firstName,
@@ -16,6 +17,7 @@ exports.encryptPassword = catchAsync(async (req, res, next) => {
     email,
     password: hashedPassword,
     phone,
+    userRole,
   };
 
   req.newUser = { ...userDoc };

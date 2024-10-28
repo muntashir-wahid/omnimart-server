@@ -22,8 +22,7 @@ exports.getUser = catchAsync(async (req, res) => {
 });
 
 exports.createUser = catchAsync(async (req, res) => {
-  const userDoc = { ...req.body };
-  userDoc.userRole = UserRoles.USER;
+  const userDoc = { ...req.newUser };
 
   const user = await prisma.users.create({
     data: userDoc,

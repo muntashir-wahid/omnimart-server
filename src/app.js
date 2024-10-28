@@ -27,10 +27,10 @@ app.use(
     origin: "http://localhost:3000",
   })
 );
-app.use(morgan("dev"));
 app.use(express.json());
+app.use(morgan("dev"));
 app.use(cookieParser());
-// app.use(parseCookeAndSetOnHeader);
+app.use(parseCookeAndSetOnHeader);
 
 app.use("/api/v1", router);
 
