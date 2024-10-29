@@ -14,7 +14,7 @@ const parseCookeAndSetOnHeader = (req, _, next) => {
 
   const accessToken = cookieArr
     ?.find((item) => item.startsWith("ACCESS_TOKEN"))
-    .split("=")[1];
+    ?.split("=")[1];
 
   req.headers.authorization = `Bearer ${accessToken}`;
 
