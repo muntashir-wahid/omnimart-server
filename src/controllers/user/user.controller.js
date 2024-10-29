@@ -4,7 +4,17 @@ const { UserRoles } = require("@prisma/client");
 const catchAsync = require("./../../utils/catchAsync");
 
 exports.getAllUsers = catchAsync(async (req, res) => {
-  const users = await prisma.users.findMany({});
+  const users = await prisma.users.findMany({
+    select: {
+      uid: true,
+      firstName: true,
+      lastName: true,
+      phone: true,
+      userRole: true,
+      userStatus: true,
+      email: true,
+    },
+  });
 
   res.status(200).json({
     status: "success",
@@ -15,9 +25,27 @@ exports.getAllUsers = catchAsync(async (req, res) => {
 });
 
 exports.getUser = catchAsync(async (req, res) => {
+  const { userUid } = req.params;
+  const user = await prisma.users.findUnique({
+    where: {
+      uid: userUid,
+    },
+    select: {
+      uid: true,
+      firstName: true,
+      lastName: true,
+      phone: true,
+      userRole: true,
+      userStatus: true,
+      email: true,
+    },
+  });
+
   res.status(200).json({
     status: "success",
-    message: "Working on getting single user",
+    data: {
+      user,
+    },
   });
 });
 
@@ -44,7 +72,16 @@ exports.updateUser = catchAsync(async (req, res) => {
 });
 
 exports.deleteUser = catchAsync(async (req, res) => {
-  await prisma.users.deleteMany({});
+  const { userUid } = req.params;
 
-  res.status(204).send();
+  await prisma.users.delete({
+    where: {
+      uid: userUid,
+    },
+  });
+
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
 });

@@ -1,5 +1,7 @@
 const express = require("express");
 
+const { UserRoles } = require("@prisma/client");
+
 const {
   getAllUsers,
   getUser,
@@ -10,14 +12,17 @@ const {
 const {
   encryptPassword,
 } = require("../../controllers/auth/middlewares/passwordEncrypt.js");
+const {
+  restrictTo,
+  protect,
+} = require("../../controllers/auth/middlewares/checkAuth.js");
 
 const router = express.Router();
 
-router
-  .route("/")
-  .get(getAllUsers)
-  .post(encryptPassword, createUser)
-  .delete(deleteUser);
-router.route("/:userId").get(getUser).patch(updateUser);
+router.use(protect, restrictTo(UserRoles.SUPER_ADMIN));
+
+router.route("/").get(getAllUsers).post(encryptPassword, createUser);
+
+router.route("/:userUid").get(getUser).patch(updateUser).delete(deleteUser);
 
 module.exports = router;
