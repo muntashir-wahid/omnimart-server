@@ -4,7 +4,7 @@ const { login, register } = require("./../../controllers/auth/auth.controller");
 const {
   checkUserCredentials,
   encryptPassword,
-} = require("../../controllers/auth/middlewares/passwordEncrypt");
+} = require("./../../middlewares/passwordEncrypt");
 
 const router = express.Router();
 

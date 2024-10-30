@@ -1,11 +1,10 @@
 const bcrypt = require("bcryptjs");
 
-const prisma = require("../../../../database/client");
-const { Status, UserRoles } = require("@prisma/client");
+const { UserRoles } = require("@prisma/client");
+const catchAsync = require("../utils/catchAsync");
+const prisma = require("../../database/client");
 
-const catchAsync = require("../../../utils/catchAsync");
-
-exports.encryptPassword = catchAsync(async (req, res, next) => {
+exports.encryptPassword = catchAsync(async (req, _, next) => {
   const { firstName, lastName, email, password, phone } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 12);
@@ -35,7 +34,7 @@ exports.checkUserCredentials = catchAsync(async (req, _, next) => {
     where: {
       email,
       AND: {
-        userStatus: Status.ACTIVE,
+        userStatus: "ACTIVE",
       },
     },
   });

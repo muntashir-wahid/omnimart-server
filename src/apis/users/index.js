@@ -9,13 +9,8 @@ const {
   updateUser,
   deleteUser,
 } = require("./../../controllers/user/user.controller.js");
-const {
-  encryptPassword,
-} = require("../../controllers/auth/middlewares/passwordEncrypt.js");
-const {
-  restrictTo,
-  protect,
-} = require("../../controllers/auth/middlewares/checkAuth.js");
+const { encryptPassword } = require("../../middlewares/passwordEncrypt.js");
+const { protect, restrictTo } = require("../../middlewares/checkAuth.js");
 
 const router = express.Router();
 

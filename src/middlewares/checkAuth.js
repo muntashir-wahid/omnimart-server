@@ -2,8 +2,9 @@ const { promisify } = require("util");
 
 const jwt = require("jsonwebtoken");
 
-const prisma = require("./../../../../database/client");
-const catchAsync = require("../../../utils/catchAsync");
+const prisma = require("../../database/client");
+
+const catchAsync = require("../utils/catchAsync");
 
 exports.protect = catchAsync(async (req, _, next) => {
   let token;
