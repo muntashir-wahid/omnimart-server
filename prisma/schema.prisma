@@ -38,10 +38,38 @@ model ProductCategories {
   updatedAt      DateTime @updatedAt
   categoryStatus Status   @default(ACTIVE)
 
-  parentCategory   ProductCategories?  @relation("CategoryToCategory", fields: [parentUid], references: [uid], onDelete: Cascade)
-  productCategores ProductCategories[] @relation("CategoryToCategory")
+  parentCategory    ProductCategories?  @relation("CategoryToCategory", fields: [parentUid], references: [uid], onDelete: Cascade)
+  productCategores  ProductCategories[] @relation("CategoryToCategory")
+  ProductAttributes ProductAttributes[]
 
   @@map("product_categories")
+}
+
+model ProductAttributes {
+  uid             String   @id @default(uuid())
+  name            String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  attributeStatus Status   @default(ACTIVE)
+
+  categoryUid          ProductCategories @relation(fields: [productCategoriesUid], references: [uid])
+  productCategoriesUid String
+  AttributeValues      AttributeValues[]
+
+  @@map("product_attributes")
+}
+
+model AttributeValues {
+  uid         String   @id @default(uuid())
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  valueStatus Status   @default(ACTIVE)
+
+  attributeUid         ProductAttributes @relation(fields: [productAttributesUid], references: [uid])
+  productAttributesUid String
+
+  @@map("attribute_values")
 }
 
 enum Status {

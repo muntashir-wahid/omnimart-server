@@ -27,10 +27,27 @@ exports.getAllCategories = catchAsync(async (req, res) => {
 });
 
 exports.getCategory = catchAsync(async (req, res) => {
+  const { categorySlug } = req.params;
+
+  const category = await prisma.productCategories.findFirst({
+    where: {
+      slug: categorySlug,
+    },
+    select: {
+      uid: true,
+      slug: true,
+      name: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+      categoryStatus: true,
+    },
+  });
+
   res.status(200).json({
     status: "success",
     data: {
-      message: "Working on it",
+      category,
     },
   });
 });

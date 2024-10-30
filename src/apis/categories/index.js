@@ -1,5 +1,6 @@
 const express = require("express");
 
+const { createSlug } = require("../../middlewares/slugify");
 const {
   getAllCategories,
   getCategory,
@@ -7,7 +8,9 @@ const {
   updateCategory,
   deleteCategory,
 } = require("../../controllers/category/category.controller");
-const { createSlug } = require("../../middlewares/slugify");
+const {
+  getAllAttributes,
+} = require("../../controllers/attribute/attribute.controller");
 
 const router = express.Router();
 
@@ -17,9 +20,11 @@ router
   .post(createSlug("name"), createCategory);
 
 router
-  .route("/:categoryUid")
+  .route("/:categorySlug")
   .get(getCategory)
   .patch(updateCategory)
   .delete(deleteCategory);
+
+router.route("/:categoryUid/attributes").get(getAllAttributes);
 
 module.exports = router;
