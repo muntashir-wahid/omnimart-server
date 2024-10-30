@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 
 const prisma = require("./../../../../database/client");
 const catchAsync = require("../../../utils/catchAsync");
-const { Status } = require("@prisma/client");
 
 exports.protect = catchAsync(async (req, _, next) => {
   let token;
@@ -30,16 +29,14 @@ exports.protect = catchAsync(async (req, _, next) => {
     where: {
       uid: decoded.uid,
       AND: {
-        NOT: {
-          userStatus: Status.DELETED,
-        },
+        userStatus: "ACTIVE",
       },
     },
   });
 
   if (!currentUser) {
     return next(
-      new AppError("The user belonging to token does no longer exit", 401)
+      new Error("The user belonging to token does no longer exit", 401)
     );
   }
 

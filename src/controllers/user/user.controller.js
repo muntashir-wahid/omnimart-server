@@ -1,10 +1,14 @@
 const prisma = require("../../../database/client");
-const { UserRoles } = require("@prisma/client");
 
 const catchAsync = require("./../../utils/catchAsync");
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await prisma.users.findMany({
+    where: {
+      NOT: {
+        userStatus: "DELETED",
+      },
+    },
     select: {
       uid: true,
       firstName: true,
@@ -65,18 +69,31 @@ exports.createUser = catchAsync(async (req, res) => {
 });
 
 exports.updateUser = catchAsync(async (req, res) => {
+  const { userUid } = req.params;
+  const user = await prisma.users.update({
+    where: {
+      uid: userUid,
+    },
+    data: req.body,
+  });
+
   res.status(200).json({
     status: "success",
-    message: "Working on updateing user",
+    data: {
+      user,
+    },
   });
 });
 
 exports.deleteUser = catchAsync(async (req, res) => {
   const { userUid } = req.params;
 
-  await prisma.users.delete({
+  await prisma.users.update({
     where: {
       uid: userUid,
+    },
+    data: {
+      userStatus: "DELETED",
     },
   });
 
