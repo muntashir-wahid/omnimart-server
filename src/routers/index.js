@@ -1,6 +1,7 @@
 const express = require("express");
 
 const authRouter = require("./../apis/auth/index");
+const categoryRouter = require("./../apis/categories/index");
 const userRouter = require("./../apis/users/index");
 
 const router = express.Router();
@@ -13,6 +14,10 @@ const routers = [
   {
     path: "/auth",
     api: authRouter,
+  },
+  {
+    path: "/categories",
+    api: categoryRouter,
   },
 ];
 
