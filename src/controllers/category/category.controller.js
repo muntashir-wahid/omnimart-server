@@ -3,10 +3,25 @@ const prisma = require("../../../database/client");
 const catchAsync = require("../../utils/catchAsync");
 
 exports.getAllCategories = catchAsync(async (req, res) => {
+  const categories = await prisma.productCategories.findMany({
+    where: {
+      categoryStatus: {
+        not: "DELETED",
+      },
+    },
+    select: {
+      uid: true,
+      slug: true,
+      name: true,
+      description: true,
+      categoryStatus: true,
+    },
+  });
+
   res.status(200).json({
     status: "success",
     data: {
-      message: "Working on it",
+      categories,
     },
   });
 });
@@ -21,10 +36,14 @@ exports.getCategory = catchAsync(async (req, res) => {
 });
 
 exports.createCategory = catchAsync(async (req, res) => {
+  const category = await prisma.productCategories.create({
+    data: req.body,
+  });
+
   res.status(201).json({
     status: "success",
     data: {
-      message: "Working on it",
+      category,
     },
   });
 });

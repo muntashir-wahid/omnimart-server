@@ -7,10 +7,14 @@ const {
   updateCategory,
   deleteCategory,
 } = require("../../controllers/category/category.controller");
+const { createSlug } = require("../../middlewares/slugify");
 
 const router = express.Router();
 
-router.route("/").get(getAllCategories).post(createCategory);
+router
+  .route("/")
+  .get(getAllCategories)
+  .post(createSlug("name"), createCategory);
 
 router
   .route("/:categoryUid")

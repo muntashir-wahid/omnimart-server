@@ -22,8 +22,26 @@ model Users {
   phone      String
   userRole   UserRoles @default(USER)
   userStatus Status    @default(ACTIVE)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
 
   @@map("Users")
+}
+
+model ProductCategories {
+  uid            String   @id @default(uuid())
+  name           String   @unique
+  slug           String
+  description    String?
+  parentUid      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  categoryStatus Status   @default(ACTIVE)
+
+  parentCategory   ProductCategories?  @relation("CategoryToCategory", fields: [parentUid], references: [uid], onDelete: Cascade)
+  productCategores ProductCategories[] @relation("CategoryToCategory")
+
+  @@map("product_categories")
 }
 
 enum Status {
