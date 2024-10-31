@@ -63,6 +63,7 @@ model AttributeValues {
 
   attributeUid         ProductAttributes @relation(fields: [productAttributesUid], references: [uid])
   productAttributesUid String
+  ProductConfigs       ProductConfigs[]
 
   @@map("attribute_values")
 }
@@ -76,11 +77,41 @@ model BaseProducts {
   category    ProductCategories @relation(fields: [categoryUid], references: [uid])
   about       String            @default("No About Available")
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  productStatus Status   @default(ACTIVE)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  productStatus Status         @default(ACTIVE)
+  ProductItems  ProductItems[]
 
   @@map("base_products")
+}
+
+model ProductItems {
+  uid            String  @id @default(uuid())
+  baseProductUid String
+  price          Decimal
+  stock          Int
+  sku            String  @unique
+  discount       Float?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  productItemStatus Status   @default(ACTIVE)
+
+  baseProduct    BaseProducts     @relation(fields: [baseProductUid], references: [uid])
+  ProductConfigs ProductConfigs[]
+
+  @@map("product_items")
+}
+
+model ProductConfigs {
+  uid               String  @id @default(uuid())
+  productItemUid    String?
+  attributeValueUid String?
+
+  productItem    ProductItems?    @relation(fields: [productItemUid], references: [uid])
+  attributeValue AttributeValues? @relation(fields: [attributeValueUid], references: [uid])
+
+  @@map("product_configs")
 }
 
 enum Status {

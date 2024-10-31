@@ -75,3 +75,77 @@ exports.createInventory = catchAsync(async (req, res) => {
     },
   });
 });
+
+exports.createInventoryStock = catchAsync(async (req, res) => {
+  const { productUid } = req.params;
+  const { price, stock, sku, discount, attributes } = req.body;
+
+  const productItem = {
+    baseProductUid: productUid,
+    stock,
+    price,
+    sku,
+    discount,
+  };
+
+  const productStock = await prisma.$transaction(async (transactionClient) => {
+    const item = await transactionClient.productItems.create({
+      data: productItem,
+    });
+
+    await transactionClient.productConfigs.createMany({
+      data: attributes.map((attribute) => ({
+        productItemUid: item.uid,
+        attributeValueUid: attribute,
+      })),
+    });
+
+    return item;
+  });
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      productStock,
+    },
+  });
+});
+
+exports.getInventoryAllStocks = catchAsync(async (req, res) => {
+  const { productUid } = req.params;
+
+  const stocks = await prisma.productItems.findMany({
+    where: {
+      baseProductUid: productUid,
+    },
+    select: {
+      uid: true,
+      price: true,
+      discount: true,
+      sku: true,
+      stock: true,
+      ProductConfigs: {
+        select: {
+          uid: true,
+          attributeValue: {
+            select: {
+              name: true,
+              attributeUid: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      stocks,
+    },
+  });
+});

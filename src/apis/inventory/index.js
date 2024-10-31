@@ -9,6 +9,8 @@ const {
   getAllInventory,
   getInventory,
   createInventory,
+  getInventoryAllStocks,
+  createInventoryStock,
 } = require("../../controllers/inventory/inventory.controller");
 
 const router = express.Router();
@@ -19,6 +21,12 @@ router
   .route("/")
   .get(getAllInventory)
   .post(createSlug("name"), createInventory);
+
 router.route("/:inventorySlug").get(getInventory);
+
+router
+  .route("/:productUid/stocks")
+  .post(createInventoryStock)
+  .get(getInventoryAllStocks);
 
 module.exports = router;
