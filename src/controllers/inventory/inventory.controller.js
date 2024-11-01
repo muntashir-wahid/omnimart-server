@@ -149,3 +149,21 @@ exports.getInventoryAllStocks = catchAsync(async (req, res) => {
     },
   });
 });
+
+exports.updateInventoryStock = catchAsync(async (req, res) => {
+  const { sku } = req.params;
+
+  const stock = await prisma.productItems.update({
+    where: {
+      sku,
+    },
+    data: req.body,
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      stock,
+    },
+  });
+});

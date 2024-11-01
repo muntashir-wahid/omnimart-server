@@ -11,6 +11,7 @@ const {
   createInventory,
   getInventoryAllStocks,
   createInventoryStock,
+  updateInventoryStock,
 } = require("../../controllers/inventory/inventory.controller");
 
 const router = express.Router();
@@ -28,5 +29,7 @@ router
   .route("/:productUid/stocks")
   .post(createInventoryStock)
   .get(getInventoryAllStocks);
+
+router.route("/:productUid/stocks/:sku").patch(updateInventoryStock);
 
 module.exports = router;
