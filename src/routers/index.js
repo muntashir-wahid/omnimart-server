@@ -5,6 +5,7 @@ const attributeRouter = require("./../apis/attributes/index");
 const categoryRouter = require("./../apis/categories/index");
 const customerRouter = require("./../apis/customers/index");
 const inventoryRouter = require("./../apis/inventory/index");
+const productsRouter = require("./../apis/products/index");
 const userRouter = require("./../apis/users/index");
 
 const router = express.Router();
@@ -33,6 +34,10 @@ const routers = [
   {
     path: "/inventory",
     api: inventoryRouter,
+  },
+  {
+    path: "/products",
+    api: productsRouter,
   },
 ];
 
