@@ -38,12 +38,11 @@ exports.getAllProducts = catchAsync(async (req, res) => {
 
 exports.getProductDetails = catchAsync(async (req, res) => {
   const { productSlug } = req.params;
-  const { item } = req.query;
+  const { item, sku } = req.query;
 
   let product;
 
   if (item) {
-    console.log(item);
     product = await prisma.productItems.findMany({
       where: {
         baseProduct: {
@@ -88,11 +87,6 @@ exports.getProductDetails = catchAsync(async (req, res) => {
       const product = await transactionClient.baseProducts.findFirst({
         where: {
           slug: productSlug,
-          // ProductItems: {
-          //   some: {
-          //     uid: "dfe"
-          //   }
-          // }
         },
         select: {
           uid: true,
@@ -117,6 +111,7 @@ exports.getProductDetails = catchAsync(async (req, res) => {
             baseProduct: {
               slug: productSlug,
             },
+            ...(sku && { sku }),
           },
         },
         select: {
