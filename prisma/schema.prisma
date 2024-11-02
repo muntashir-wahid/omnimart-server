@@ -18,6 +18,7 @@ model Users {
   userStatus Status    @default(ACTIVE)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime? @updatedAt
+  Cart       Cart[]
 
   @@map("Users")
 }
@@ -99,6 +100,7 @@ model ProductItems {
 
   baseProduct    BaseProducts     @relation(fields: [baseProductUid], references: [uid])
   ProductConfigs ProductConfigs[]
+  CartItems      CartItems[]
 
   @@map("product_items")
 }
@@ -112,6 +114,27 @@ model ProductConfigs {
   attributeValue AttributeValues? @relation(fields: [attributeValueUid], references: [uid])
 
   @@map("product_configs")
+}
+
+model Cart {
+  uid       String   @id @default(uuid())
+  userUid   String
+  createdAt DateTime @default(now())
+
+  user      Users       @relation(fields: [userUid], references: [uid], onDelete: Cascade)
+  CartItems CartItems[]
+}
+
+model CartItems {
+  uid        String   @id @default(uuid())
+  cartUid    String
+  productUid String
+  quantity   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  cart    Cart         @relation(fields: [cartUid], references: [uid], onDelete: Cascade)
+  product ProductItems @relation(fields: [productUid], references: [uid], onDelete: Cascade)
 }
 
 enum Status {
