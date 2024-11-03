@@ -1,3 +1,6 @@
+const { promisify } = require("util");
+const jwt = require("jsonwebtoken");
+
 const prisma = require("../../../database/client");
 
 const catchAsync = require("./../../utils/catchAsync");
@@ -100,5 +103,53 @@ exports.deleteUser = catchAsync(async (req, res) => {
   res.status(204).json({
     status: "success",
     data: null,
+  });
+});
+
+exports.getMe = catchAsync(async (req, res) => {
+  let token;
+  // Get and check token token in the header
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  if (token === "undefined") {
+    return res.status(200).json({
+      status: "success",
+      data: {
+        user: null,
+      },
+    });
+  }
+
+  // Verify token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // Check if the user is currently available
+  const currentUser = await prisma.users.findUnique({
+    where: {
+      uid: decoded.uid,
+      AND: {
+        userStatus: "ACTIVE",
+      },
+    },
+    select: {
+      uid: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      userRole: true,
+      phone: true,
+    },
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: currentUser,
+    },
   });
 });

@@ -8,11 +8,14 @@ const {
   createUser,
   updateUser,
   deleteUser,
+  getMe,
 } = require("./../../controllers/user/user.controller.js");
 const { encryptPassword } = require("../../middlewares/passwordEncrypt.js");
 const { protect, restrictTo } = require("../../middlewares/checkAuth.js");
 
 const router = express.Router();
+
+router.get("/me", getMe);
 
 router.use(protect, restrictTo(UserRoles.SUPER_ADMIN));
 
