@@ -12,9 +12,11 @@ exports.getCart = catchAsync(async (req, res) => {
     select: {
       CartItems: {
         select: {
+          uid: true,
           quantity: true,
           product: {
             select: {
+              uid: true,
               price: true,
               discount: true,
               ProductConfigs: {
@@ -55,7 +57,7 @@ exports.getCart = catchAsync(async (req, res) => {
 
 exports.createCart = catchAsync(async (req, res) => {
   const { user, cart: existingCart } = req;
-  const { productUid } = req.body;
+  const { productUid, decrement: decrementItem } = req.body;
 
   let cart;
 
@@ -73,17 +75,6 @@ exports.createCart = catchAsync(async (req, res) => {
           productUid,
           quantity: 1,
           cartUid: cartInstance.uid,
-        },
-      });
-
-      await transactionClient.productItems.update({
-        where: {
-          uid: productUid,
-        },
-        data: {
-          stock: {
-            decrement: 1,
-          },
         },
       });
 
@@ -106,63 +97,36 @@ exports.createCart = catchAsync(async (req, res) => {
 
     // Product is new to cart
     if (!existingProduct) {
-      cart = await prisma.$transaction(async function (transactionClient) {
-        const cartProduct = await transactionClient.cartItems.create({
-          data: {
-            cartUid: existingCart.uid,
-            productUid,
-            quantity: 1,
-          },
-        });
-
-        await transactionClient.productItems.update({
-          where: {
-            uid: productUid,
-          },
-          data: {
-            stock: {
-              decrement: 1,
-            },
-          },
-        });
-
-        return {
-          ...cartProduct,
-          ...cartProduct,
-        };
+      cart = await prisma.cartItems.create({
+        data: {
+          cartUid: existingCart.uid,
+          productUid,
+          quantity: 1,
+        },
       });
     }
 
     // Already in the cart
     if (existingProduct) {
-      cart = await prisma.$transaction(async function (transactionClient) {
-        const cartProduct = await transactionClient.cartItems.update({
+      if (decrementItem && existingProduct.quantity === 1) {
+        await prisma.cartItems.delete({
+          where: {
+            uid: existingProduct.uid,
+          },
+        });
+        cart = null;
+      } else {
+        cart = await prisma.cartItems.update({
           where: {
             uid: existingProduct.uid,
           },
           data: {
             quantity: {
-              increment: 1,
+              ...(decrementItem ? { decrement: 1 } : { increment: 1 }),
             },
           },
         });
-
-        await transactionClient.productItems.update({
-          where: {
-            uid: productUid,
-          },
-          data: {
-            stock: {
-              decrement: 1,
-            },
-          },
-        });
-
-        return {
-          ...cartProduct,
-          ...cartProduct,
-        };
-      });
+      }
     }
   }
 
