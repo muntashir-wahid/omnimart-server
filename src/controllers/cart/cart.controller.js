@@ -116,6 +116,22 @@ exports.createCart = catchAsync(async (req, res) => {
         });
         cart = null;
       } else {
+        // Check for stock when increment the stock
+        if (!decrementItem) {
+          const hasStock = await prisma.productItems.findFirst({
+            where: {
+              uid: existingProduct.productUid,
+              stock: {
+                gt: existingProduct.quantity,
+              },
+            },
+          });
+
+          if (!hasStock) {
+            throw new Error("Insufficient Stock");
+          }
+        }
+
         cart = await prisma.cartItems.update({
           where: {
             uid: existingProduct.uid,
