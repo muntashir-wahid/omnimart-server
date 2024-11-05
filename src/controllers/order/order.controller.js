@@ -23,7 +23,8 @@ exports.getOrder = catchAsync(async (req, res) => {
 });
 
 exports.createOrder = catchAsync(async (req, res) => {
-  const { totalPrice, deliveryCharge } = req.body;
+  const { totalPrice, deliveryCharge, deliveryMethod, paymentMethod } =
+    req.body;
   const { uid: userUid } = req.user;
 
   const cart = await prisma.cart.findFirst({
@@ -87,10 +88,12 @@ exports.createOrder = catchAsync(async (req, res) => {
 
     const createdOrder = await transactionClient.productOrders.create({
       data: {
-        totalPrice: totalPrice || 1000,
-        deliveryCharge: deliveryCharge || 10,
+        totalPrice: totalPrice,
+        deliveryCharge: deliveryCharge,
         userUid,
         addressUid: "Jashore",
+        paymentMethod,
+        deliveryMethod,
       },
     });
 
