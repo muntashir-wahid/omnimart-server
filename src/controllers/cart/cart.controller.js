@@ -76,6 +76,39 @@ exports.createCart = catchAsync(async (req, res) => {
           quantity: 1,
           cartUid: cartInstance.uid,
         },
+
+        select: {
+          quantity: true,
+          uid: true,
+          product: {
+            select: {
+              uid: true,
+              price: true,
+              discount: true,
+              ProductConfigs: {
+                select: {
+                  attributeValue: {
+                    select: {
+                      name: true,
+                      uid: true,
+                      attributeUid: {
+                        select: {
+                          name: true,
+                          uid: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              baseProduct: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
       });
 
       return {
@@ -102,6 +135,39 @@ exports.createCart = catchAsync(async (req, res) => {
           cartUid: existingCart.uid,
           productUid,
           quantity: 1,
+        },
+
+        select: {
+          quantity: true,
+          uid: true,
+          product: {
+            select: {
+              uid: true,
+              price: true,
+              discount: true,
+              ProductConfigs: {
+                select: {
+                  attributeValue: {
+                    select: {
+                      name: true,
+                      uid: true,
+                      attributeUid: {
+                        select: {
+                          name: true,
+                          uid: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              baseProduct: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
         },
       });
     }
@@ -139,6 +205,39 @@ exports.createCart = catchAsync(async (req, res) => {
           data: {
             quantity: {
               ...(decrementItem ? { decrement: 1 } : { increment: 1 }),
+            },
+          },
+
+          select: {
+            quantity: true,
+            uid: true,
+            product: {
+              select: {
+                uid: true,
+                price: true,
+                discount: true,
+                ProductConfigs: {
+                  select: {
+                    attributeValue: {
+                      select: {
+                        name: true,
+                        uid: true,
+                        attributeUid: {
+                          select: {
+                            name: true,
+                            uid: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                baseProduct: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
             },
           },
         });
