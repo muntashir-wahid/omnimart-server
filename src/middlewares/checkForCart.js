@@ -15,6 +15,7 @@ exports.checkStockAndUser = catchAsync(async (req, res, next) => {
       },
     },
   });
+
   if (!hasStock) {
     return next(new Error("Insufficient Stock"));
   }

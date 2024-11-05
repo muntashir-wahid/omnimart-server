@@ -6,6 +6,7 @@ const cartRouter = require("./../apis/cart/index");
 const categoryRouter = require("./../apis/categories/index");
 const customerRouter = require("./../apis/customers/index");
 const inventoryRouter = require("./../apis/inventory/index");
+const orderRouter = require("./../apis/orders/index");
 const productsRouter = require("./../apis/products/index");
 const userRouter = require("./../apis/users/index");
 
@@ -43,6 +44,10 @@ const routers = [
   {
     path: "/cart",
     api: cartRouter,
+  },
+  {
+    path: "/orders",
+    api: orderRouter,
   },
 ];
 

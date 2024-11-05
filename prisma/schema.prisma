@@ -8,17 +8,18 @@ datasource db {
 }
 
 model Users {
-  uid        String    @id @default(uuid())
-  email      String    @unique
-  firstName  String
-  lastName   String
-  password   String
-  phone      String
-  userRole   UserRoles @default(USER)
-  userStatus Status    @default(ACTIVE)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime? @updatedAt
-  Cart       Cart[]
+  uid           String          @id @default(uuid())
+  email         String          @unique
+  firstName     String
+  lastName      String
+  password      String
+  phone         String
+  userRole      UserRoles       @default(USER)
+  userStatus    Status          @default(ACTIVE)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?       @updatedAt
+  Cart          Cart[]
+  ProductOrders ProductOrders[]
 
   @@map("Users")
 }
@@ -101,6 +102,7 @@ model ProductItems {
   baseProduct    BaseProducts     @relation(fields: [baseProductUid], references: [uid])
   ProductConfigs ProductConfigs[]
   CartItems      CartItems[]
+  OrderLine      OrderLine[]
 
   @@map("product_items")
 }
@@ -135,6 +137,44 @@ model CartItems {
 
   cart    Cart         @relation(fields: [cartUid], references: [uid], onDelete: Cascade)
   product ProductItems @relation(fields: [productUid], references: [uid], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+model ProductOrders {
+  uid            String  @id @default(uuid())
+  totalPrice     Decimal
+  deliveryCharge Int     @default(0)
+
+  paymentMethod  PaymentMethods  @default(CASH_ON_DELIVERY)
+  orderStatus    OrderStatus     @default(ORDER_PLACED)
+  deliveryMethod DeliveryMethods @default(HOME_DELIVERY)
+
+  userUid    String
+  addressUid String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      Users       @relation(fields: [userUid], references: [uid], onDelete: Cascade)
+  OrderLine OrderLine[]
+
+  @@map("product_orders")
+}
+
+model OrderLine {
+  uid      String  @id @default(uuid())
+  price    Decimal
+  discount Decimal
+  qunatity Int
+
+  orderUid   String
+  productUid String
+
+  order   ProductOrders @relation(fields: [orderUid], references: [uid], onDelete: Cascade)
+  product ProductItems  @relation(fields: [productUid], references: [uid])
+
+  @@map("orders_line")
 }
 
 enum Status {
@@ -148,4 +188,21 @@ enum UserRoles {
   USER
   ADMIN
   SUPER_ADMIN
+}
+
+enum OrderStatus {
+  ORDER_PLACED
+  ACCEPTED
+  DELIVERED
+  COMPLETED
+}
+
+enum PaymentMethods {
+  CASH_ON_DELIVERY
+  ONLINE_PAYMENT
+}
+
+enum DeliveryMethods {
+  HOME_DELIVERY
+  PICK_UP_POINT
 }
