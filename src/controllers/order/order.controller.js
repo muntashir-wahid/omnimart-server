@@ -58,14 +58,134 @@ exports.getAllOrders = catchAsync(async (req, res) => {
 });
 
 exports.getOrder = catchAsync(async (req, res) => {
-  const { orderUid } = req.params;
+  const {
+    user: { userRole, uid: userUid },
+    params: { orderUid },
+  } = req;
 
-  console.log(orderUid);
+  const orderQuery = prisma.productOrders.findFirst;
+
+  let order;
+
+  if (userRole === "USER") {
+    order = await orderQuery({
+      where: {
+        uid: orderUid,
+      },
+      select: {
+        uid: true,
+        totalPrice: true,
+        deliveryCharge: true,
+        paymentMethod: true,
+        orderStatus: true,
+        deliveryMethod: true,
+        userUid: true,
+        addressUid: true,
+        createdAt: true,
+        updatedAt: true,
+        OrderLine: {
+          select: {
+            uid: true,
+            discount: true,
+            price: true,
+            qunatity: true,
+            product: {
+              select: {
+                ProductConfigs: {
+                  select: {
+                    attributeValue: {
+                      select: {
+                        name: true,
+                        uid: true,
+                        attributeUid: {
+                          select: {
+                            name: true,
+                            uid: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                baseProduct: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  if (userRole === "ADMIN") {
+    order = await orderQuery({
+      where: {
+        uid: orderUid,
+      },
+
+      select: {
+        uid: true,
+        totalPrice: true,
+        deliveryCharge: true,
+        paymentMethod: true,
+        orderStatus: true,
+        deliveryMethod: true,
+        userUid: true,
+        addressUid: true,
+        createdAt: true,
+        updatedAt: true,
+        OrderLine: {
+          select: {
+            uid: true,
+            discount: true,
+            price: true,
+            qunatity: true,
+            product: {
+              select: {
+                ProductConfigs: {
+                  select: {
+                    attributeValue: {
+                      select: {
+                        name: true,
+                        uid: true,
+                        attributeUid: {
+                          select: {
+                            name: true,
+                            uid: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                baseProduct: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+          },
+        },
+      },
+    });
+  }
 
   res.status(200).json({
     status: "success",
     data: {
-      order: "Working on it",
+      order,
     },
   });
 });
