@@ -3,16 +3,64 @@ const prisma = require("../../../database/client");
 const catchAsync = require("../../utils/catchAsync");
 
 exports.getAllOrders = catchAsync(async (req, res) => {
+  const {
+    user: { userRole, uid: userUid },
+  } = req;
+
+  const ordersQuery = prisma.productOrders.findMany;
+
+  let orders;
+
+  if (userRole === "USER") {
+    orders = await ordersQuery({
+      where: {
+        userUid,
+      },
+
+      select: {
+        uid: true,
+        totalPrice: true,
+        orderStatus: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
+
+  if (userRole === "ADMIN") {
+    orders = await ordersQuery({
+      select: {
+        uid: true,
+        totalPrice: true,
+        orderStatus: true,
+        createdAt: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
+
   res.status(200).json({
     status: "success",
     data: {
-      orders: "Working on it",
+      orders,
     },
   });
 });
 
 exports.getOrder = catchAsync(async (req, res) => {
   const { orderUid } = req.params;
+
+  console.log(orderUid);
 
   res.status(200).json({
     status: "success",

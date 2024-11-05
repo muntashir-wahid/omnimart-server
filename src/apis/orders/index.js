@@ -15,7 +15,7 @@ router.use(protect);
 
 router
   .route("/")
-  .get(getAllOrders)
+  .get(restrictTo(UserRoles.USER, UserRoles.ADMIN), getAllOrders)
   .post(restrictTo(UserRoles.USER), createOrder);
 
 router.route("/:orderUid").get(getOrder);
