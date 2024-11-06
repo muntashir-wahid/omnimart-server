@@ -1,4 +1,5 @@
 const prisma = require("../../../database/client");
+const AppError = require("../../utils/appError");
 
 const catchAsync = require("../../utils/catchAsync");
 
@@ -194,7 +195,7 @@ exports.createCart = catchAsync(async (req, res) => {
           });
 
           if (!hasStock) {
-            throw new Error("Insufficient Stock");
+            throw new AppError("Insufficient Stock", 400);
           }
         }
 
