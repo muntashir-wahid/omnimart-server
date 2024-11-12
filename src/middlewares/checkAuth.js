@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const prisma = require("../../database/client");
 
 const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 
 exports.protect = catchAsync(async (req, _, next) => {
   let token;
@@ -37,7 +38,7 @@ exports.protect = catchAsync(async (req, _, next) => {
 
   if (!currentUser) {
     return next(
-      new Error("The user belonging to token does no longer exit", 401)
+      new AppError("The user belonging to token does no longer exit", 401)
     );
   }
 

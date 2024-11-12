@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const { UserRoles } = require("@prisma/client");
 const catchAsync = require("../utils/catchAsync");
 const prisma = require("../../database/client");
+const AppError = require("../utils/appError");
 
 exports.encryptPassword = catchAsync(async (req, _, next) => {
   const { firstName, lastName, email, password, phone } = req.body;
@@ -27,7 +28,7 @@ exports.checkUserCredentials = catchAsync(async (req, _, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new Error("Please Provide email and password"));
+    return next(new AppError("Please Provide email and password", 400));
   }
 
   const user = await prisma.users.findUnique({
@@ -40,13 +41,13 @@ exports.checkUserCredentials = catchAsync(async (req, _, next) => {
   });
 
   if (!user) {
-    return next(new Error("User doesn't exist!"));
+    return next(new AppError("User doesn't exist!", 400));
   }
 
   const isPasswordMatched = await bcrypt.compare(password, user.password);
 
   if (!isPasswordMatched) {
-    return next(new Error("Credentials is not correct!"));
+    return next(new AppError("Credentials is not correct!", 400));
   }
 
   req.authenticatedUser = {
