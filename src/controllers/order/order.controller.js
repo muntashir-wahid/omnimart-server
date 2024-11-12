@@ -1,4 +1,5 @@
 const prisma = require("../../../database/client");
+const AppError = require("../../utils/appError");
 
 const catchAsync = require("../../utils/catchAsync");
 
@@ -239,7 +240,7 @@ exports.createOrder = catchAsync(async (req, res) => {
       });
 
       if (!product) {
-        throw new Error("Insufficient Stock");
+        throw new AppError("Insufficient Stock", 400);
       }
 
       await transactionClient.productItems.update({
