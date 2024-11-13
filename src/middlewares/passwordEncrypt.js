@@ -57,6 +57,8 @@ exports.checkUserCredentials = catchAsync(async (req, _, next) => {
     email: user.email,
     userRole: user.userRole,
     phone: user.phone,
+    userStatus: user.userStatus,
+    createdAt: user.createdAt,
   };
 
   next();

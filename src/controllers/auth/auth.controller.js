@@ -42,6 +42,8 @@ exports.register = catchAsync(async (req, res) => {
       email: true,
       userRole: true,
       phone: true,
+      userStatus: true,
+      createdAt: true,
     },
   });
 
