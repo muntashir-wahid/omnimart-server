@@ -177,6 +177,57 @@ model OrderLine {
   @@map("orders_line")
 }
 
+model Divisions {
+  id      Int     @id
+  name    String
+  bn_name String?
+  lat     Decimal
+  long    Decimal
+
+  Districts Districts[]
+
+  @@map("divisions")
+}
+
+model Districts {
+  id          Int     @id
+  division_id Int
+  name        String
+  bn_name     String?
+  lat         Decimal
+  long        Decimal
+
+  Divisions Divisions @relation(fields: [division_id], references: [id])
+
+  Upazilas  Upazilas[]
+  DhakaCity DhakaCity[]
+
+  @@map("districts")
+}
+
+model Upazilas {
+  id          Int    @id
+  district_id Int
+  name        String
+  bn_name     String
+
+  district Districts @relation(fields: [district_id], references: [id])
+
+  @@map("upazilas")
+}
+
+model DhakaCity {
+  id               Int     @id @default(autoincrement())
+  name             String
+  bn_name          String
+  district_id      Int
+  city_corporation String?
+
+  discrict Districts @relation(fields: [district_id], references: [id])
+
+  @@map("dhaka_city")
+}
+
 enum Status {
   ACTIVE
   PENDING
