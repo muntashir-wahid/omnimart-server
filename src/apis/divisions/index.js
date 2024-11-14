@@ -1,5 +1,6 @@
 const express = require("express");
 
+const districtsRouter = require("./../districts/index");
 const {
   getAllDivisions,
   getDivision,
@@ -9,5 +10,7 @@ const router = express.Router();
 
 router.route("/").get(getAllDivisions);
 router.route("/:divisionUid").get(getDivision);
+
+router.use("/:divisionUid/districts", districtsRouter);
 
 module.exports = router;
