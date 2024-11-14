@@ -5,6 +5,7 @@ const attributeRouter = require("./../apis/attributes/index");
 const cartRouter = require("./../apis/cart/index");
 const categoryRouter = require("./../apis/categories/index");
 const customerRouter = require("./../apis/customers/index");
+const divisionRouter = require("./../apis/divisions/index");
 const inventoryRouter = require("./../apis/inventory/index");
 const orderRouter = require("./../apis/orders/index");
 const productsRouter = require("./../apis/products/index");
@@ -32,6 +33,10 @@ const routers = [
   {
     path: "/customers",
     api: customerRouter,
+  },
+  {
+    path: "/divisions",
+    api: divisionRouter,
   },
   {
     path: "/inventory",
