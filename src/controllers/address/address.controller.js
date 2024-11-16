@@ -3,26 +3,50 @@ const prisma = require("../../../database/client");
 const catchAsync = require("../../utils/catchAsync");
 
 exports.getAllAddresses = catchAsync(async (req, res) => {
-  // const { categoryUid } = req.params;
+  const {
+    user: { uid: userUid },
+  } = req;
 
-  // const attributes = await prisma.productAttributes.findMany({
-  //   where: {
-  //     attributeStatus: {
-  //       not: "DELETED",
-  //     },
-  //     productCategoriesUid: categoryUid,
-  //   },
-  //   select: {
-  //     uid: true,
-  //     name: true,
-  //     attributeStatus: true,
-  //   },
-  // });
+  const addresses = await prisma.userAddresses.findMany({
+    where: {
+      userUid,
+    },
+    select: {
+      uid: true,
+      label: true,
+      isDefault: true,
+      address: {
+        select: {
+          addressLine: true,
+          district: {
+            select: {
+              name: true,
+            },
+          },
+          division: {
+            select: {
+              name: true,
+            },
+          },
+          dhakaCity: {
+            select: {
+              name: true,
+            },
+          },
+          upazila: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
   res.status(200).json({
     status: "success",
     data: {
-      address: "Working on it",
+      addresses,
     },
   });
 });
@@ -38,20 +62,43 @@ exports.getAddress = catchAsync(async (req, res) => {
 });
 
 exports.createAddress = catchAsync(async (req, res) => {
-  // const { name, productCategoriesUid } = req.body;
-  console.log(req.body);
+  const {
+    body: { label, addressLine, divisionId, districtId, areaId },
+    user: { uid: userUid },
+  } = req;
 
-  // const attribute = await prisma.productAttributes.create({
-  //   data: {
-  //     name,
-  //     productCategoriesUid,
-  //   },
-  // });
+  const newAddress = await prisma.$transaction(async function (
+    transactionClient
+  ) {
+    const upazialOrCityId =
+      +districtId === 1 && +areaId < 142
+        ? { dhakaCityId: +areaId }
+        : { upazilaId: +areaId };
+
+    const address = await transactionClient.addresses.create({
+      data: {
+        divisionId: +divisionId,
+        districtId: +districtId,
+        addressLine,
+        ...upazialOrCityId,
+      },
+    });
+
+    await transactionClient.userAddresses.create({
+      data: {
+        userUid,
+        addressUid: address.uid,
+        label,
+      },
+    });
+
+    return address;
+  });
 
   res.status(201).json({
     status: "success",
     data: {
-      address: "Working on it",
+      address: newAddress,
     },
   });
 });

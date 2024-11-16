@@ -20,6 +20,7 @@ model Users {
   updatedAt     DateTime?       @updatedAt
   Cart          Cart[]
   ProductOrders ProductOrders[]
+  UserAddresses UserAddresses[]
 
   @@map("Users")
 }
@@ -185,6 +186,7 @@ model Divisions {
   long    Decimal
 
   Districts Districts[]
+  Addresses Addresses[]
 
   @@map("divisions")
 }
@@ -201,6 +203,7 @@ model Districts {
 
   Upazilas  Upazilas[]
   DhakaCity DhakaCity[]
+  Addresses Addresses[]
 
   @@map("districts")
 }
@@ -211,7 +214,8 @@ model Upazilas {
   name        String
   bn_name     String
 
-  district Districts @relation(fields: [district_id], references: [id])
+  district  Districts   @relation(fields: [district_id], references: [id])
+  Addresses Addresses[]
 
   @@map("upazilas")
 }
@@ -223,9 +227,50 @@ model DhakaCity {
   district_id      Int
   city_corporation String?
 
-  discrict Districts @relation(fields: [district_id], references: [id])
+  discrict  Districts   @relation(fields: [district_id], references: [id])
+  Addresses Addresses[]
 
   @@map("dhaka_city")
+}
+
+model Addresses {
+  uid         String  @id @default(uuid())
+  divisionId  Int
+  districtId  Int
+  upazilaId   Int?
+  dhakaCityId Int?
+  addressLine String?
+  country     String  @default("Bangladesh")
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  addressStatus Status   @default(ACTIVE)
+
+  division  Divisions  @relation(fields: [divisionId], references: [id])
+  district  Districts  @relation(fields: [districtId], references: [id])
+  dhakaCity DhakaCity? @relation(fields: [dhakaCityId], references: [id])
+  upazila   Upazilas?  @relation(fields: [upazilaId], references: [id])
+
+  UserAddresses UserAddresses[]
+
+  @@map("addresses")
+}
+
+model UserAddresses {
+  uid        String  @id @default(uuid())
+  addressUid String
+  userUid    String
+  label      String?
+  isDefault  Boolean @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  addressStatus Status   @default(ACTIVE)
+
+  address Addresses @relation(fields: [addressUid], references: [uid], onDelete: Cascade)
+  user    Users     @relation(fields: [userUid], references: [uid], onDelete: Cascade)
+
+  @@map("user_addresses")
 }
 
 enum Status {
