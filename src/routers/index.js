@@ -1,5 +1,6 @@
 const express = require("express");
 
+const addressRouter = require("./../apis/addresses/index");
 const authRouter = require("./../apis/auth/index");
 const attributeRouter = require("./../apis/attributes/index");
 const cartRouter = require("./../apis/cart/index");
@@ -42,6 +43,10 @@ const routers = [
   {
     path: "/districts",
     api: districtRouter,
+  },
+  {
+    path: "/addresses",
+    api: addressRouter,
   },
   {
     path: "/inventory",
