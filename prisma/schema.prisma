@@ -152,12 +152,13 @@ model ProductOrders {
   deliveryMethod DeliveryMethods @default(HOME_DELIVERY)
 
   userUid    String
-  addressUid String?
+  addressUid String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user      Users       @relation(fields: [userUid], references: [uid], onDelete: Cascade)
+  address   Addresses   @relation(fields: [addressUid], references: [uid], onDelete: Cascade)
   OrderLine OrderLine[]
 
   @@map("product_orders")
@@ -252,6 +253,7 @@ model Addresses {
   upazila   Upazilas?  @relation(fields: [upazilaId], references: [id])
 
   UserAddresses UserAddresses[]
+  ProductOrders ProductOrders[]
 
   @@map("addresses")
 }
