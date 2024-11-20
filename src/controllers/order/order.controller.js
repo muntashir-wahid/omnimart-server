@@ -80,8 +80,6 @@ exports.getOrder = catchAsync(async (req, res) => {
         paymentMethod: true,
         orderStatus: true,
         deliveryMethod: true,
-        userUid: true,
-        addressUid: true,
         createdAt: true,
         updatedAt: true,
         OrderLine: {
@@ -117,6 +115,37 @@ exports.getOrder = catchAsync(async (req, res) => {
             },
           },
         },
+        userAddress: {
+          select: {
+            uid: true,
+            label: true,
+            address: {
+              select: {
+                addressLine: true,
+                district: {
+                  select: {
+                    name: true,
+                  },
+                },
+                division: {
+                  select: {
+                    name: true,
+                  },
+                },
+                dhakaCity: {
+                  select: {
+                    name: true,
+                  },
+                },
+                upazila: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -135,7 +164,6 @@ exports.getOrder = catchAsync(async (req, res) => {
         orderStatus: true,
         deliveryMethod: true,
         userUid: true,
-        addressUid: true,
         createdAt: true,
         updatedAt: true,
         OrderLine: {
@@ -179,6 +207,37 @@ exports.getOrder = catchAsync(async (req, res) => {
             phone: true,
           },
         },
+        userAddress: {
+          select: {
+            uid: true,
+            label: true,
+            address: {
+              select: {
+                addressLine: true,
+                district: {
+                  select: {
+                    name: true,
+                  },
+                },
+                division: {
+                  select: {
+                    name: true,
+                  },
+                },
+                dhakaCity: {
+                  select: {
+                    name: true,
+                  },
+                },
+                upazila: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -192,8 +251,13 @@ exports.getOrder = catchAsync(async (req, res) => {
 });
 
 exports.createOrder = catchAsync(async (req, res) => {
-  const { totalPrice, deliveryCharge, deliveryMethod, paymentMethod } =
-    req.body;
+  const {
+    totalPrice,
+    deliveryCharge,
+    deliveryMethod,
+    paymentMethod,
+    userAddressUid,
+  } = req.body;
   const { uid: userUid } = req.user;
 
   const cart = await prisma.cart.findFirst({
@@ -260,7 +324,7 @@ exports.createOrder = catchAsync(async (req, res) => {
         totalPrice: totalPrice,
         deliveryCharge: deliveryCharge,
         userUid,
-        addressUid: "Jashore",
+        userAddressUid,
         paymentMethod,
         deliveryMethod,
       },

@@ -151,15 +151,17 @@ model ProductOrders {
   orderStatus    OrderStatus     @default(ORDER_PLACED)
   deliveryMethod DeliveryMethods @default(HOME_DELIVERY)
 
-  userUid    String
-  addressUid String
+  userUid        String
+  addressUid     String?
+  userAddressUid String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      Users       @relation(fields: [userUid], references: [uid], onDelete: Cascade)
-  address   Addresses   @relation(fields: [addressUid], references: [uid], onDelete: Cascade)
-  OrderLine OrderLine[]
+  user        Users         @relation(fields: [userUid], references: [uid], onDelete: Cascade)
+  address     Addresses?    @relation(fields: [addressUid], references: [uid], onDelete: Cascade)
+  userAddress UserAddresses @relation(fields: [userAddressUid], references: [uid], onDelete: Cascade)
+  OrderLine   OrderLine[]
 
   @@map("product_orders")
 }
@@ -269,8 +271,9 @@ model UserAddresses {
   updatedAt     DateTime @updatedAt
   addressStatus Status   @default(ACTIVE)
 
-  address Addresses @relation(fields: [addressUid], references: [uid], onDelete: Cascade)
-  user    Users     @relation(fields: [userUid], references: [uid], onDelete: Cascade)
+  address       Addresses       @relation(fields: [addressUid], references: [uid], onDelete: Cascade)
+  user          Users           @relation(fields: [userUid], references: [uid], onDelete: Cascade)
+  ProductOrders ProductOrders[]
 
   @@map("user_addresses")
 }
