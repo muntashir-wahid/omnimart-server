@@ -2,11 +2,19 @@ const prisma = require("../../../database/client");
 const catchAsync = require("../../utils/catchAsync");
 
 exports.getAllInventory = catchAsync(async (req, res) => {
+  const { search, category } = req.query;
+
+  const queryObj = {
+    ...(search && { name: { contains: search } }),
+    ...(category && { category: { slug: category } }),
+  };
+
   const inventory = await prisma.baseProducts.findMany({
     where: {
       NOT: {
         productStatus: "DELETED",
       },
+      ...queryObj,
     },
     select: {
       uid: true,
