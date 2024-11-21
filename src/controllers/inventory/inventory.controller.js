@@ -121,10 +121,15 @@ exports.createInventoryStock = catchAsync(async (req, res) => {
 
 exports.getInventoryAllStocks = catchAsync(async (req, res) => {
   const { productUid } = req.params;
+  const { search } = req.query;
+  const queryObj = {
+    ...(search && { sku: { contains: search } }),
+  };
 
   const stocks = await prisma.productItems.findMany({
     where: {
       baseProductUid: productUid,
+      ...queryObj,
     },
     select: {
       uid: true,
