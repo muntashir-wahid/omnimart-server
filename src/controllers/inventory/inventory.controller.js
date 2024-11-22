@@ -2,7 +2,7 @@ const prisma = require("../../../database/client");
 const catchAsync = require("../../utils/catchAsync");
 
 exports.getAllInventory = catchAsync(async (req, res) => {
-  const { search, category } = req.query;
+  const { search, category, sort } = req.query;
 
   const queryObj = {
     ...(search && { name: { contains: search } }),
@@ -29,6 +29,12 @@ exports.getAllInventory = catchAsync(async (req, res) => {
           name: true,
         },
       },
+    },
+
+    orderBy: {
+      ...(sort && sort.startsWith("-")
+        ? { basePrice: "desc" }
+        : { basePrice: "asc" }),
     },
   });
 
