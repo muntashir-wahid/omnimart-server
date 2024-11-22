@@ -7,6 +7,29 @@ exports.getAllOrders = catchAsync(async (req, res) => {
   const {
     user: { userRole, uid: userUid },
   } = req;
+  const { search, status, sort } = req.query;
+  const queryObj = {
+    ...(search && {
+      OR: [
+        {
+          user: {
+            firstName: {
+              contains: search,
+            },
+          },
+        },
+        {
+          user: {
+            lastName: {
+              contains: search,
+            },
+          },
+        },
+      ],
+    }),
+
+    ...(status && { orderStatus: status }),
+  };
 
   const ordersQuery = prisma.productOrders.findMany;
 
@@ -16,6 +39,7 @@ exports.getAllOrders = catchAsync(async (req, res) => {
     orders = await ordersQuery({
       where: {
         userUid,
+        ...queryObj,
       },
 
       select: {
@@ -32,6 +56,9 @@ exports.getAllOrders = catchAsync(async (req, res) => {
 
   if (userRole === "ADMIN") {
     orders = await ordersQuery({
+      where: {
+        ...queryObj,
+      },
       select: {
         uid: true,
         totalPrice: true,
@@ -44,8 +71,11 @@ exports.getAllOrders = catchAsync(async (req, res) => {
           },
         },
       },
+
       orderBy: {
-        createdAt: "desc",
+        ...(sort && sort.startsWith("-")
+          ? { createdAt: "asc" }
+          : { createdAt: "desc" }),
       },
     });
   }
