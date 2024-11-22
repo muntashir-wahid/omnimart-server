@@ -3,13 +3,14 @@ const prisma = require("../../../database/client");
 const catchAsync = require("../../utils/catchAsync");
 
 exports.getAllProducts = catchAsync(async (req, res) => {
-  const { category } = req.query;
+  const { category, search, sort } = req.query;
   const products = await prisma.baseProducts.findMany({
     where: {
       category: {
         slug: category,
       },
       productStatus: "ACTIVE",
+      ...(search && { name: { contains: search } }),
     },
 
     select: {
@@ -25,6 +26,12 @@ exports.getAllProducts = catchAsync(async (req, res) => {
           slug: true,
         },
       },
+    },
+
+    orderBy: {
+      ...(sort && sort.startsWith("-")
+        ? { basePrice: "desc" }
+        : { basePrice: "asc" }),
     },
   });
 
