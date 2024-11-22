@@ -18,6 +18,11 @@ exports.getAllCustomers = catchAsync(async (req, res) => {
             contains: search,
           },
         },
+        {
+          phone: {
+            contains: search,
+          },
+        },
       ],
     }),
 
