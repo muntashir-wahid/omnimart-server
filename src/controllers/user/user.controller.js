@@ -6,11 +6,39 @@ const prisma = require("../../../database/client");
 const catchAsync = require("./../../utils/catchAsync");
 
 exports.getAllUsers = catchAsync(async (req, res) => {
+  const { search, status, role } = req.query;
+
+  const queryObj = {
+    ...(search && {
+      OR: [
+        {
+          firstName: {
+            contains: search,
+          },
+        },
+        {
+          lastName: {
+            contains: search,
+          },
+        },
+        {
+          phone: {
+            contains: search,
+          },
+        },
+      ],
+    }),
+
+    ...(status && { userStatus: status }),
+    ...(role && { userRole: role }),
+  };
+
   const users = await prisma.users.findMany({
     where: {
       NOT: {
         userStatus: "DELETED",
       },
+      ...queryObj,
     },
     select: {
       uid: true,
