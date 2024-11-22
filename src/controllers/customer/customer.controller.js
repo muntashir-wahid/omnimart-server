@@ -3,12 +3,34 @@ const prisma = require("../../../database/client");
 const catchAsync = require("../../utils/catchAsync");
 
 exports.getAllCustomers = catchAsync(async (req, res) => {
+  const { search, status } = req.query;
+
+  const queryObj = {
+    ...(search && {
+      OR: [
+        {
+          firstName: {
+            contains: search,
+          },
+        },
+        {
+          lastName: {
+            contains: search,
+          },
+        },
+      ],
+    }),
+
+    ...(status && { userStatus: status }),
+  };
+
   const customers = await prisma.users.findMany({
     where: {
       NOT: {
         userStatus: "DELETED",
       },
       userRole: "USER",
+      ...queryObj,
     },
     select: {
       uid: true,
