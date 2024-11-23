@@ -26,6 +26,15 @@ exports.getAllProducts = catchAsync(async (req, res) => {
           slug: true,
         },
       },
+      ProductImages: {
+        select: {
+          image: {
+            select: {
+              fileUrl: true,
+            },
+          },
+        },
+      },
     },
 
     orderBy: {

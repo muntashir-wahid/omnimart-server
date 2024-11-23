@@ -1,6 +1,8 @@
 const prisma = require("../../../database/client");
 const catchAsync = require("../../utils/catchAsync");
 
+const { uploadToCloudinary } = require("../../utils/handleFile");
+
 exports.getAllInventory = catchAsync(async (req, res) => {
   const { search, category, sort } = req.query;
 
@@ -58,12 +60,22 @@ exports.getInventory = catchAsync(async (req, res) => {
         },
       },
     },
+
     include: {
       category: {
         select: {
           name: true,
           uid: true,
           slug: true,
+        },
+      },
+      ProductImages: {
+        include: {
+          image: {
+            select: {
+              fileUrl: true,
+            },
+          },
         },
       },
     },
@@ -78,8 +90,37 @@ exports.getInventory = catchAsync(async (req, res) => {
 });
 
 exports.createInventory = catchAsync(async (req, res) => {
-  const inventory = await prisma.baseProducts.create({
-    data: req.body,
+  const { name, slug, basePrice, categoryUid, about } = req.body;
+
+  console.log(req.body);
+
+  const file = req.file;
+  const fileType = file.mimetype.split("/").pop();
+  const cloudinaryResponse = await uploadToCloudinary(file, {
+    format: fileType,
+  });
+
+  const inventory = await prisma.$transaction(async function (
+    transactionClient
+  ) {
+    const baseProduct = await transactionClient.baseProducts.create({
+      data: { name, slug, basePrice, categoryUid, about },
+    });
+
+    const mediaFile = await transactionClient.mediaRoom.create({
+      data: {
+        fileUrl: cloudinaryResponse.secure_url,
+      },
+    });
+
+    await transactionClient.productImages.create({
+      data: {
+        baseProductUid: baseProduct.uid,
+        imageUid: mediaFile.uid,
+      },
+    });
+
+    return baseProduct;
   });
 
   res.status(201).json({

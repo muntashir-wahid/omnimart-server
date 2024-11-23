@@ -80,10 +80,11 @@ model BaseProducts {
   category    ProductCategories @relation(fields: [categoryUid], references: [uid])
   about       String            @default("No About Available")
 
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  productStatus Status         @default(ACTIVE)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  productStatus Status          @default(ACTIVE)
   ProductItems  ProductItems[]
+  ProductImages ProductImages[]
 
   @@map("base_products")
 }
@@ -104,6 +105,7 @@ model ProductItems {
   ProductConfigs ProductConfigs[]
   CartItems      CartItems[]
   OrderLine      OrderLine[]
+  ProductImages  ProductImages[]
 
   @@map("product_items")
 }
@@ -276,6 +278,29 @@ model UserAddresses {
   ProductOrders ProductOrders[]
 
   @@map("user_addresses")
+}
+
+model MediaRoom {
+  uid     String @id @default(uuid())
+  fileUrl String @default("https://images.unsplash.com/photo-1523275335684-37898b6baf30")
+
+  createdAt     DateTime        @default(now())
+  ProductImages ProductImages[]
+
+  @@map("media_room")
+}
+
+model ProductImages {
+  uid            String  @id @default(uuid())
+  baseProductUid String?
+  productItemUid String?
+  imageUid       String
+
+  image       MediaRoom     @relation(fields: [imageUid], references: [uid])
+  baseProduct BaseProducts? @relation(fields: [baseProductUid], references: [uid])
+  productItem ProductItems? @relation(fields: [productItemUid], references: [uid])
+
+  @@map("product_images")
 }
 
 enum Status {

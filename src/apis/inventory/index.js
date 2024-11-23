@@ -13,6 +13,7 @@ const {
   createInventoryStock,
   updateInventoryStock,
 } = require("../../controllers/inventory/inventory.controller");
+const { upload } = require("../../utils/handleFile");
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.use(protect, restrictTo(UserRoles.ADMIN));
 router
   .route("/")
   .get(getAllInventory)
-  .post(createSlug("name"), createInventory);
+  .post(upload.single("image"), createSlug("name"), createInventory);
 
 router.route("/:inventorySlug").get(getInventory);
 
