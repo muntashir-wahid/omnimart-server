@@ -101,7 +101,7 @@ model ProductItems {
   updatedAt         DateTime @updatedAt
   productItemStatus Status   @default(ACTIVE)
 
-  baseProduct    BaseProducts     @relation(fields: [baseProductUid], references: [uid])
+  baseProduct    BaseProducts     @relation(fields: [baseProductUid], references: [uid], onDelete: Cascade)
   ProductConfigs ProductConfigs[]
   CartItems      CartItems[]
   OrderLine      OrderLine[]
@@ -115,8 +115,8 @@ model ProductConfigs {
   productItemUid    String?
   attributeValueUid String?
 
-  productItem    ProductItems?    @relation(fields: [productItemUid], references: [uid])
-  attributeValue AttributeValues? @relation(fields: [attributeValueUid], references: [uid])
+  productItem    ProductItems?    @relation(fields: [productItemUid], references: [uid], onDelete: Cascade)
+  attributeValue AttributeValues? @relation(fields: [attributeValueUid], references: [uid], onDelete: Cascade)
 
   @@map("product_configs")
 }
@@ -296,9 +296,9 @@ model ProductImages {
   productItemUid String?
   imageUid       String
 
-  image       MediaRoom     @relation(fields: [imageUid], references: [uid])
-  baseProduct BaseProducts? @relation(fields: [baseProductUid], references: [uid])
-  productItem ProductItems? @relation(fields: [productItemUid], references: [uid])
+  image       MediaRoom     @relation(fields: [imageUid], references: [uid], onDelete: Cascade)
+  baseProduct BaseProducts? @relation(fields: [baseProductUid], references: [uid], onDelete: Cascade)
+  productItem ProductItems? @relation(fields: [productItemUid], references: [uid], onDelete: Cascade)
 
   @@map("product_images")
 }

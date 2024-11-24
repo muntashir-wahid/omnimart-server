@@ -96,6 +96,16 @@ exports.getProductDetails = catchAsync(async (req, res) => {
             },
           },
         },
+
+        ProductImages: {
+          select: {
+            image: {
+              select: {
+                fileUrl: true,
+              },
+            },
+          },
+        },
       },
     });
   } else {
@@ -138,6 +148,15 @@ exports.getProductDetails = catchAsync(async (req, res) => {
               stock: true,
               sku: true,
               discount: true,
+              ProductImages: {
+                select: {
+                  image: {
+                    select: {
+                      fileUrl: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },

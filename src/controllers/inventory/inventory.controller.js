@@ -78,6 +78,20 @@ exports.getInventory = catchAsync(async (req, res) => {
           },
         },
       },
+
+      ProductItems: {
+        select: {
+          ProductImages: {
+            select: {
+              image: {
+                select: {
+                  fileUrl: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 
@@ -91,8 +105,6 @@ exports.getInventory = catchAsync(async (req, res) => {
 
 exports.createInventory = catchAsync(async (req, res) => {
   const { name, slug, basePrice, categoryUid, about } = req.body;
-
-  console.log(req.body);
 
   const file = req.file;
   const fileType = file.mimetype.split("/").pop();
@@ -135,17 +147,36 @@ exports.createInventoryStock = catchAsync(async (req, res) => {
   const { productUid } = req.params;
   const { price, stock, sku, discount, attributes } = req.body;
 
+  const file = req.file;
+  const fileType = file.mimetype.split("/").pop();
+  const cloudinaryResponse = await uploadToCloudinary(file, {
+    format: fileType,
+  });
+
   const productItem = {
     baseProductUid: productUid,
-    stock,
-    price,
+    stock: +stock,
+    price: +price,
     sku,
-    discount,
+    discount: +discount,
   };
 
   const productStock = await prisma.$transaction(async (transactionClient) => {
+    const mediaFile = await transactionClient.mediaRoom.create({
+      data: {
+        fileUrl: cloudinaryResponse.secure_url,
+      },
+    });
+
     const item = await transactionClient.productItems.create({
       data: productItem,
+    });
+
+    await transactionClient.productImages.create({
+      data: {
+        productItemUid: item.uid,
+        imageUid: mediaFile.uid,
+      },
     });
 
     await transactionClient.productConfigs.createMany({
@@ -195,6 +226,15 @@ exports.getInventoryAllStocks = catchAsync(async (req, res) => {
                   name: true,
                 },
               },
+            },
+          },
+        },
+      },
+      ProductImages: {
+        select: {
+          image: {
+            select: {
+              fileUrl: true,
             },
           },
         },

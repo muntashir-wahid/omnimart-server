@@ -28,7 +28,7 @@ router.route("/:inventorySlug").get(getInventory);
 
 router
   .route("/:productUid/stocks")
-  .post(createInventoryStock)
+  .post(upload.single("image"), createInventoryStock)
   .get(getInventoryAllStocks);
 
 router.route("/:productUid/stocks/:sku").patch(updateInventoryStock);
